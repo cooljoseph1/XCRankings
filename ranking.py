@@ -15,7 +15,7 @@ def error(scores, times):
 def gradient(scores, times):
     g = []
     for s, t in zip(scores, times):
-        g.append(np.sum(1/s * (np.log(s/scores) - np.log(t/times))))
+        g.append(np.sum((np.log(s/scores) - np.log(t/times)))/s)
     return np.array(g)
 
 def bayesian(scores):
@@ -26,7 +26,7 @@ def bayesian(scores):
 def bayesian_gradient(scores):
     return (1/4 - scores**2 / 16) * np.exp(-scores**2 / 8)
 
-def update(scores, race, alpha=1, beta=10):
+def update(scores, race, alpha=0.1, beta=0.1):
     ss, ts = [], []
     for name, time in race.items():
         if name not in scores:
@@ -38,4 +38,4 @@ def update(scores, race, alpha=1, beta=10):
     grad1 = gradient(ss, ts)
     grad2 = bayesian_gradient(ss)
     for name, g1, g2 in zip(race.keys(), grad1, grad2):
-        scores[name] += g1*alpha + g2*beta
+        scores[name] += -g1*alpha + g2*beta

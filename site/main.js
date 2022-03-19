@@ -3,7 +3,7 @@ var races = [];
 async function update(e) {
   let f = e.target.files[0];
   await read(f);
-  for (let n = 0; n < 100; n++) {
+  for (let n = 0; n < 1000; n++) {
     let i = Math.floor(Math.random() * races.length);
     batch_update(scores, races[i]);
   }
@@ -35,31 +35,33 @@ function gradient(scores, times) {
   for (let i = 0; i < scores.length; i++) {
     let g = 0;
     for (let j = 0; j < scores.length; j++) {
-      g += (Math.log(scores[i] / scores[j]) - Math.log(times[i] / times[j])) ** 2
+      g += Math.log(scores[i] / scores[j]) - Math.log(times[i] / times[j]);
     }
     grad.push(g / scores[i]);
   }
   return grad;
 }
 
+var sigma = 100;
+
 function bayesian(scores) {
   // Pushes towards the center of the Rayeleigh distribution
-  // x/4 * e^(-x**2/8)
+  // x / sigma * e^(-x**2 / sigma / 2)
   let grad = [];
   for (let i = 0; i < scores.length; i++) {
     let s = scores[i];
-    grad.push(1 / 4 - s / 16) * Math.exp(-s * s / 8)
+    grad.push(1 / sigma - (s / sigma) ** 2) * Math.exp(-s * s / sigma / 2);
   }
   return grad;
 }
 
-function batch_update(scores, race, alpha = 0.1, beta = 0.1) {
+function batch_update(scores, race, alpha = 1, beta = 1) {
   let score_batch = [];
   let time_batch = [];
   Object.keys(race).forEach(function(key) {
     time_batch.push(race[key]);
     if (!scores.hasOwnProperty(key)) {
-      scores[key] = 2;
+      scores[key] = Math.sqrt(sigma);
     }
     score_batch.push(scores[key]);
   });
@@ -81,8 +83,8 @@ function drawTable() {
   data.addColumn('string', 'Name');
   data.addColumn('number', 'Score');
   let array = Object.keys(scores).map((name) => [name, scores[name]]);
-  array = array.sort((a, b) => a[1] > b[1]).reverse();
   data.addRows(array);
+  data.sort([{ column: 1, desc: false }]);
 
   var table = new google.visualization.Table(document.getElementById('table_div'));
   table.draw(data, { showRowNumber: true, width: '100%', height: '100%' });

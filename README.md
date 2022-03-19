@@ -19,16 +19,16 @@ This system uses machine learning and Bayesian statistics to create an objective
 summed over all pairs of scores and times in every race. We add the following prior to the scores:
 <br></br>
 <center>
-<img src="https://render.githubusercontent.com/render/math?math=R(x)=\ln\left(\frac{x}{\sigma^2}\cdot e^{-\frac{x^2}{2\sigma^2}}\right)">
+<img src="https://render.githubusercontent.com/render/math?math=R(x)=\frac{x}{\sigma^2}\cdot e^{-\frac{x^2}{2\sigma^2}}">
 </center>
 <br></br>
-which is the log of a Rayleigh distribution (race times are proportional to a Rayleigh distribution, then we log it to stay consistent with the error). We chose σ=10, but it doesn't really matter where you center the distribution. Combining the error and the prior gives a loss function:
+which is a Rayleigh distribution (approximately proportional to the population mile-time distribution). We chose σ=100, but it doesn't really matter where you center the distribution. Combining the error and the prior gives a loss function:
 <br></br>
 <center>
-<img src="https://render.githubusercontent.com/render/math?math=L=\alpha E - \beta R">
+<img src="https://render.githubusercontent.com/render/math?math=L=\alpha E - \beta \ln R">
 </center>
 <br></br>
-We chose α = β = 0.01, but if you want more spread you could decrease β. To minimize this loss, we used batched gradient descent. Each race is considered as a single batch. We repeatedly select batches, calculate the gradient for that batch, and then follow along the gradient to update the scores. They converge relatively quickly to good scores.
+where we take a log to be consistent with the error. We chose α = 1, β = 0.1, but if you want more spread you could decrease β. To minimize this loss, we used batched gradient descent. Each race is considered as a single batch. We repeatedly select batches, calculate the gradient for that batch, and then follow along the gradient to update the scores. They converge relatively quickly to good scores.
 
 ![scores converging](imgs/converge.JPG "Random Runners' Scores")
 

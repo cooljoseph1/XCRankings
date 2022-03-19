@@ -61,7 +61,7 @@ function gradient(scores, times) {
   return grad;
 }
 
-var sigma = 100;
+var sigma = 10000;
 
 function bayesian(scores) {
   // Pushes towards the center of the Rayeleigh distribution
@@ -74,7 +74,7 @@ function bayesian(scores) {
   return grad;
 }
 
-function batch_update(scores, race, alpha = 0.01, beta = 0.01) {
+function batch_update(scores, race, alpha = 1, beta = 0.1) {
   let score_batch = [];
   let time_batch = [];
   Object.keys(race).forEach(function(key) {

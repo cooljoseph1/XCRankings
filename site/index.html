@@ -58,9 +58,9 @@
 
       $$R(x) = \frac{xe^{-\frac{x^2}{2\sigma^2}}}{\sigma^2}.$$
 
-      with \(\sigma = 10.\) We subtract a portion of this from our error (awarding high-probability scores), so our overall loss is
+      with \(\sigma = 10.\) We subtract a portion of the log of this from our error (awarding high-probability scores), so our overall loss is
 
-      $$L = \alpha E - \beta R$$
+      $$L = \alpha E - \beta \ln(R)$$
 
       for free parameters \(\alpha\) and \(\beta.\) We chose \(\alpha = \beta = 0.1\), but that was mostly arbitrary. To the left you can see several randomly picked scores as they find the optimum solution through gradient descent.
     </div>

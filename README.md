@@ -28,6 +28,9 @@ which is the log of a Rayleigh distribution (race times are proportional to a Ra
 <img src="https://render.githubusercontent.com/render/math?math=L=\alpha E - \beta R">
 </center>
 <br></br>
-We chose α = β = 0.01, but if you want more spread you could decrease β. To minimize this loss, we used batched gradient descent. Each race is considered as a single batch. We repeatedly select batches, calculate the gradient for that batch, and then follow along the gradient to update the scores. They converge relatively quickly to good rankings.
+We chose α = β = 0.01, but if you want more spread you could decrease β. To minimize this loss, we used batched gradient descent. Each race is considered as a single batch. We repeatedly select batches, calculate the gradient for that batch, and then follow along the gradient to update the scores. They converge relatively quickly to good scores.
 
 ![scores converging](imgs/converge.JPG "Random Runners' Scores")
+
+The scores reflect true skill well. The top ranked runner is Conner Mantz, who won the NCAA Championship in 2021. Nico Young placed second. Also near the top is Aiden Troutner, who won the high school Nike Cross Nationals in 2017.
+![rankings](imgs/rankings.JPG "Rankings")

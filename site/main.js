@@ -1,4 +1,5 @@
 var races = [];
+var history = {};
 
 async function update(e) {
   let f = e.target.files[0];
@@ -6,8 +7,15 @@ async function update(e) {
   for (let n = 0; n < 1000; n++) {
     let i = Math.floor(Math.random() * races.length);
     batch_update(scores, races[i]);
+    Object.keys(scores).forEach(function(name) {
+      if (!history.hasOwnProperty(name)) {
+        history[name] = [];
+      }
+      history[name].push(scores[name]);
+    });
   }
   drawTable();
+  drawGraph();
 }
 
 async function read(file) {
@@ -26,11 +34,11 @@ async function read(file) {
     let timeArray = time.split(":");
     let timeSeconds = 0.0;
     for (let i = 0; i < timeArray.length; i++) {
-        timeSeconds *= 60.0;
-        timeSeconds += parseFloat(timeArray[i]);
+      timeSeconds *= 60.0;
+      timeSeconds += parseFloat(timeArray[i]);
     }
     if (!isNaN(timeSeconds)) {
-        race[name] = timeSeconds;
+      race[name] = timeSeconds;
     }
   }
   races.push(race);
@@ -66,7 +74,7 @@ function bayesian(scores) {
   return grad;
 }
 
-function batch_update(scores, race, alpha = 1, beta = 1) {
+function batch_update(scores, race, alpha = 0.1, beta = 0.1) {
   let score_batch = [];
   let time_batch = [];
   Object.keys(race).forEach(function(key) {
@@ -86,7 +94,7 @@ function batch_update(scores, race, alpha = 1, beta = 1) {
 
 
 scores = {};
-google.charts.load('current', { 'packages': ['table'] });
+google.charts.load('current', { 'packages': ['table', 'corechart', 'line'] });
 google.charts.setOnLoadCallback(drawTable);
 
 function drawTable() {
@@ -100,3 +108,51 @@ function drawTable() {
   var table = new google.visualization.Table(document.getElementById('table_div'));
   table.draw(data, { showRowNumber: true, width: '100%', height: '100%' });
 }
+
+function drawGraph() {
+  var data = new google.visualization.DataTable();
+  var players = [];
+  let names = Object.keys(scores);
+  let n = names.length;
+  data.addColumn('number', 'Time')
+  for (let i = 0; i < 4; i++) {
+    data.addColumn('number', 'Runner ' + i);
+    players.push(names[Math.floor(Math.random() * n)])
+  }
+
+  for (let i = -1000; i < 0; i++) {
+    let row = [i + 1000];
+    for (let j = 0; j < 4; j++) {
+      let l = history[names[j]];
+      row.push(l[i + l.length]);
+    }
+    data.addRow(row);
+  }
+
+  var options = {
+    legend: { position: 'none' },
+    hAxis: {
+      title: 'Time',
+    },
+    vAxis: {
+      title: 'Score',
+    },
+  };
+
+  var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
+  chart.draw(data, options);
+}
+
+var switcher = document.getElementById("switcher");
+switcher.addEventListener("click", function() {
+  if (document.getElementById('table_div').style.display != "none") {
+    document.getElementById('table_div').style.display = "none";
+    document.getElementById('score_graph').style.display = "block";
+    drawGraph();
+  } else {
+    document.getElementById('table_div').style.display = "block";
+    document.getElementById('score_graph').style.display = "none";
+    drawTable();
+  }
+  console.log(document.getElementById('table_div').style.display);
+});

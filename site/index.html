@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,10 +6,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="styles.css">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
   <script src="main.js" defer></script>
 </head>
 
 <body>
+  <div
+    style="visibility: hidden; overflow: hidden; position: absolute; top: 0px; height: 1px; width: auto; padding: 0px; border: 0px; margin: 0px; text-align: left; text-indent: 0px; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal;">
+    <div id="MathJax_Hidden"><br><br><br><br><br><br><br><br></div>
+  </div>
+  <div id="MathJax_Message" style="display: none;"></div>
   <div id="header">
     <p>It Runs<br>
       <span class="subtitle">Ranking runners through gradient descent.</span>
@@ -18,9 +23,48 @@
   </div>
   <div id="bar">
     <p id="pupload">Upload a race: <input type="file" id="upload"></p>
-    <i class="fa fa-arrows-alt tooltip"><span class="tooltiptext">Behind the curtains...</span></i>
+    <i id="switcher" class="fa fa-arrows-alt tooltip"><span class="tooltiptext">Behind the scenes...</span></i>
   </div>
-  <div id="table_div"></div>
+  <div id="table_div">
+    <div class="google-visualization-table" style="position: relative; z-index: 0; max-width: 100%; max-height: 100%; width: 100%; height: 100%;">
+      <div style="position: relative; overflow: auto; max-width: 100%; max-height: 100%; width: 100%; height: 100%;">
+        <table cellspacing="0" class="google-visualization-table-table" style="width: 100%; height: 100%;">
+          <thead>
+            <tr class="google-visualization-table-tr-head">
+              <th class="google-visualization-table-th gradient">&nbsp;</th>
+              <th class="google-visualization-table-th gradient">Name</th>
+              <th class="google-visualization-table-th gradient google-visualization-table-type-number">Score</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="score_graph" style="display: none;">
+    <div id="line_chart"></div>
+    <div id="theory">
+      We want to assign a score to each runner. These scores should be reflective of their race times, i.e.
+
+      $$\frac{\text{score}_{\text{Player 1}}}{\text{score}_{\text{Player 2}}}\approx \frac{\text{time}_{\text{Player 1}}}{\text{time}_{\text{Player 2}}}.$$
+
+      The time ratio won't remain constant for every race, but it should stay decently close assuming each runner has a normal race. To find the scores, we start with an error computed as follows:
+
+      $$E = \left[\ln\left(\frac{\text{score}_{\text{Player 1}}}{\text{score}_{\text{Player 2}}}\right) - \ln\left(\frac{\text{time}_{\text{Player 1}}}{\text{time}_{\text{Player 2}}}\right)\right]^2,$$
+
+      summed over every pair of players for every possible race. The logs make it so it doesn't matter if we switch the order of the two players. We minimize this with batched gradient descent. Each race is used as a separate batch. One issue with
+      this approach is the best athletes' scores will keep decreasing (even going negative!) while the slower athlete's scores will increase forever. We add in a little Bayesian statistics to reign in this divergence. People's running times form a
+      distribution similar to a Rayleigh distribution:
+
+      $$R(x) = \frac{xe^{-\frac{x^2}{2\sigma^2}}}{\sigma^2}.$$
+
+      with \(\sigma = 10.\) We subtract a portion of this from our error (awarding high-probability scores), so our overall loss is
+
+      $$L = \alpha E - \beta R$$
+
+      for free parameters \(\alpha\) and \(\beta.\) We chose \(\alpha = \beta = 0.1\), but that was mostly arbitrary. To the left you can see several randomly picked scores as they find the optimum solution through gradient descent.
+    </div>
+  </div>
 </body>
 
 </html>

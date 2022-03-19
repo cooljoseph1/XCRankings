@@ -60,4 +60,24 @@ html, body {
   visibility: visible;
 }
 
-</style>
+#table_div {
+  height: 500px;
+}
+
+#score_graph {
+  width: 100%;
+  height: 500px;
+}
+
+#line_chart {
+  position: absolute;
+  left: 0;
+  width: 50%;
+  height: 500px;
+}
+
+#theory {
+  position: absolute;
+  right: 0;
+  width: 50%;
+}

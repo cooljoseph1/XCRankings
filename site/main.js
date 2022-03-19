@@ -20,7 +20,18 @@ async function read(file) {
       continue;
     }
     let info = line.split(",");
-    race[info[0]] = parseFloat(info[1]);
+    let name = info[0];
+    let team = info[1];
+    let time = info[2];
+    let timeArray = time.split(":");
+    let timeSeconds = 0.0;
+    for (let i = 0; i < timeArray.length; i++) {
+        timeSeconds *= 60.0;
+        timeSeconds += parseFloat(timeArray[i]);
+    }
+    if (!isNaN(timeSeconds)) {
+        race[name] = timeSeconds;
+    }
   }
   races.push(race);
 }

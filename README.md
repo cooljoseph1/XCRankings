@@ -1,4 +1,8 @@
 # It Runs.
+## Installation
+
+    git clone https://github.com/cooljoseph1/XCRankings.git
+
 ## Ranking runners through Bayesian statistics.
 Currently the top runner ranking systems are either purely time-based or subjective. Here are the 2021 Utah HS Boys rankings according to Athletic.net:
 

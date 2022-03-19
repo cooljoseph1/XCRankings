@@ -74,7 +74,7 @@ function bayesian(scores) {
   return grad;
 }
 
-function batch_update(scores, race, alpha = 0.1, beta = 0.1) {
+function batch_update(scores, race, alpha = 0.01, beta = 0.01) {
   let score_batch = [];
   let time_batch = [];
   Object.keys(race).forEach(function(key) {
@@ -114,7 +114,7 @@ function drawGraph() {
   var players = [];
   let names = Object.keys(scores);
   let n = names.length;
-  data.addColumn('number', 'Time')
+  data.addColumn('number', 'Batch #')
   for (let i = 0; i < 4; i++) {
     data.addColumn('number', 'Runner ' + i);
     players.push(names[Math.floor(Math.random() * n)])
@@ -132,7 +132,7 @@ function drawGraph() {
   var options = {
     legend: { position: 'none' },
     hAxis: {
-      title: 'Time',
+      title: 'Batch #',
     },
     vAxis: {
       title: 'Score',

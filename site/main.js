@@ -69,7 +69,7 @@ function bayesian(scores) {
   let grad = [];
   for (let i = 0; i < scores.length; i++) {
     let s = scores[i];
-    grad.push(1 / sigma - (s / sigma) ** 2) * Math.exp(-s * s / sigma / 2);
+    grad.push(1 / s - s / sigma);
   }
   return grad;
 }
